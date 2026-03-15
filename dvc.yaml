@@ -1,0 +1,36 @@
+stages:
+  data_ingestion:
+    cmd: python proj2/src/data_ingestion.py
+    deps:
+    - proj2/src/data_ingestion.py
+    outs:
+    - proj2/data/raw
+  data_preprocessing:
+    cmd: python proj2/src/data_preprocessing.py
+    deps:
+    - proj2/data/raw
+    - proj2/src/data_preprocessing.py
+    outs:
+    - proj2/data/interim
+  feature_engineering:
+    cmd: python proj2/src/feature_engineering.py
+    deps:
+    - proj2/data/interim
+    - proj2/src/feature_engineering.py
+    outs:
+    - proj2/data/processed
+  model_building:
+    cmd: python proj2/src/model_training.py
+    deps:
+    - proj2/data/processed
+    - proj2/src/model_training.py
+    outs:
+    - models/model.pkl
+  model_evaluation:
+    cmd: python proj2/src/model_evaluation.py
+    deps:
+    - models/model.pkl
+    - proj2/src/model_evaluation.py
+    metrics:
+    - proj2/reports/metrics.json
+    
