@@ -2,6 +2,7 @@ import pandas as pd
 import os
 from sklearn.model_selection import train_test_split
 import logging
+import yaml
 
 
 # ensure the log directory exists
@@ -20,6 +21,24 @@ console_handler.setFormatter(formatter)
 file_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
+
+
+def load_params(params_path : str) -> dict:
+    """load params from a YAML file."""
+    try:
+        with open(params_path , 'r') as file:
+            params = yaml.safe_load(file)
+        logger.debug('parametres retrieved from %s', params_path)
+        return params
+    except FileNotFoundError:
+        logger.error('file not fund  %s ', params_path)
+        raise
+    except yaml.YAMLError as e:
+        logger.error('yaml error %s ',e)
+        raise
+    except Exception as e:
+        logger.error('unexpected error %s',e)
+        raise
 
 
 def load_data(data_url : str) -> pd.DataFrame:
@@ -64,7 +83,9 @@ def save_data(train_data : pd.DataFrame , test_data : pd.DataFrame , data_path :
 
 def main():
     try :
-        test_size = 0.2
+        #test_size = 0.2
+        params = load_params(params_path= 'params.yaml')
+        test_size = params['data_ingestion']['test_size']
         data_path = "https://raw.githubusercontent.com/vikashishere/YT-MLOPS-Complete-ML-Pipeline/refs/heads/main/experiments/spam.csv"
         df = load_data(data_url=data_path)
         final_df =  preprocess_data(df)

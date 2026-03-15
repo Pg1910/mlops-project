@@ -1,8 +1,12 @@
+
+# parameters are taken from the individual main()
 stages:
   data_ingestion:
     cmd: python proj2/src/data_ingestion.py
     deps:
     - proj2/src/data_ingestion.py
+    params:
+    - data_ingestion.test_size
     outs:
     - proj2/data/raw
   data_preprocessing:
@@ -17,6 +21,8 @@ stages:
     deps:
     - proj2/data/interim
     - proj2/src/feature_engineering.py
+    params:
+    - feature_engineering.max_features
     outs:
     - proj2/data/processed
   model_building:
@@ -24,6 +30,9 @@ stages:
     deps:
     - proj2/data/processed
     - proj2/src/model_training.py
+    params:
+    - model_building.n_estimators
+    - model_building.random_state
     outs:
     - models/model.pkl
   model_evaluation:
