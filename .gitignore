@@ -1,3 +1,8 @@
+/proj2/data
+/proj2/models
+/proj2/reports
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
