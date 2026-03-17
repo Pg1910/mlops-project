@@ -1,0 +1,4 @@
+[core]
+    remote = proj2
+['remote "proj2"']
+    url = s3://dvc-s3proj-pg
