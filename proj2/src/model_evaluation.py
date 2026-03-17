@@ -6,6 +6,10 @@ import logging
 import json 
 from sklearn.metrics import accuracy_score , precision_score , recall_score ,roc_auc_score
 from sklearn.ensemble import RandomForestClassifier
+import yaml
+from dvclive import Live
+
+
 
 log_dir = 'logs'
 os.makedirs(log_dir , exist_ok=True)
@@ -26,6 +30,24 @@ console_handler.setFormatter(formatter)
 file_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
+
+
+def load_params(params_path : str) -> dict:
+    """load params from a YAML file."""
+    try:
+        with open(params_path , 'r') as file:
+            params = yaml.safe_load(file)
+        logger.debug('parametres retrieved from %s', params_path)
+        return params
+    except FileNotFoundError:
+        logger.error('file not fund  %s ', params_path)
+        raise
+    except yaml.YAMLError as e:
+        logger.error('yaml error %s ',e)
+        raise
+    except Exception as e:
+        logger.error('unexpected error %s',e)
+        raise
 
 
 def load_model(file_path : str):
@@ -94,15 +116,23 @@ def save_metrics(metrics:dict , file_path :str) -> None:
 
 def main ():
     try:
+        params = load_params(params_path= 'params.yaml')
         clf = load_model('./models/model.pkl')
         test_data = load_data('./proj2/data/processed/test_tfidf.csv')
         X_test = test_data.iloc[: , :-1].values
         y_test = test_data.iloc[: , -1].values
         metrics = evaluate_model(clf , X_test , y_test)
+
+        # experimnet tracking using dvc live
+        with Live(save_dvc_exp = True) as dvc_live: #type: ignore
+                dvc_live.log_metric('accuracy' , metrics['accuracy'])
+                dvc_live.log_metric('precision', metrics['precision'])
+                dvc_live.log_metric('recall'   , metrics['recall'])
+                dvc_live.log_params(params)
+
         save_metrics(metrics , './proj2/reports/metrics.json')
     except Exception as e:
         logger.error('failed to complete the model  evaluation process : %s ',e)
         print(f"Error , {e}")
 if __name__ == '__main__':
     main()
-    

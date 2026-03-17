@@ -1,4 +1,3 @@
-
 # parameters are taken from the individual main()
 stages:
   data_ingestion:
@@ -42,4 +41,10 @@ stages:
     - proj2/src/model_evaluation.py
     metrics:
     - proj2/reports/metrics.json
-    
+params:
+- dvclive/params.yaml
+metrics:
+- dvclive/metrics.json
+plots:
+- dvclive/plots/metrics:
+    x: step
